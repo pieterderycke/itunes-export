@@ -8,6 +8,8 @@ parser = argparse.ArgumentParser(description="An utility application to export i
 parser.add_argument("--output", "-o", help="The outpout folder for exporting the playlists.", required=True)
 parser.add_argument("--ignore", help="Ignore a specific playlist.", action='append')
 parser.add_argument("--library", "-l", help="The path to the iTunes Library XML.", default=str(Path.home().joinpath("Music/iTunes/iTunes Music Library.xml")))
+parser.add_argument("--export-genius-playlists", action='store_true', dest='exportGeniusPlaylists')
+parser.add_argument("--export-smart-playlists", action='store_true', dest='exportSmartPlaylists')
 args = parser.parse_args()
 
 libraryPath = args.library
@@ -18,10 +20,10 @@ def cleanupPlaylistName(playlistName):
         return playlistName.replace("/", "").replace("\\", "").replace(":", "")
 
 def exportPlaylist(playlist: Playlist, parentPath: Path):
-        if(playlist.is_genius_playlist):
+        if(playlist.is_genius_playlist and not args.exportGeniusPlaylists):
                 return
 
-        if(playlist.is_smart_playlist):
+        if(playlist.is_smart_playlist and not args.exportSmartPlaylists):
                 return
 
         if(playlist.is_folder):

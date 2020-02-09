@@ -14,7 +14,7 @@ args = parser.parse_args()
 
 libraryPath = args.library
 playlistRootPath = Path(args.output)
-ignoreList= args.ignore
+ignoreList= args.ignore if args.ignore is not None else []
 
 def cleanupPlaylistName(playlistName):
         return playlistName.replace("/", "").replace("\\", "").replace(":", "")
@@ -39,7 +39,11 @@ def exportPlaylist(playlist: Playlist, parentPath: Path):
                 playlistContent = ""
                 for track in playlist.tracks:
                         if track.location != None:
-                                playlistContent +=  os.path.relpath(track.location, start=parentPath) + "\n"
+                                try:
+                                        playlistContent +=  os.path.relpath(track.location, start=parentPath) + "\n"
+                                except ValueError:
+                                        print("Warning: Could not add the track \"" + track.location + "\" as relative path to the playlist \"" + playlistName + "\"; added the track as absolute path instead.")
+                                        playlistContent += track.location + "\n"
 
                 playlistPath = parentPath.joinpath(cleanupPlaylistName(playlist.name) + ".m3u")
                 playlistPath.write_text(playlistContent, encoding="utf8")
